@@ -3,7 +3,7 @@ const { inspect } = require('util');
 const now = require('performance-now');
 const { MessageAttachment } = require('discord.js');
 const { Command } = require('klasa');
-const { util } = require('util');
+const util = require('util');
 
 module.exports = class extends Command {
   constructor (...args) {
@@ -39,7 +39,7 @@ module.exports = class extends Command {
     // The depth to get the types of nested data structures, recursively
     this.typeDepth = 2;
     // The number of lines before the output is considered overly long
-    this.tooManyLines = 7;
+    this.tooManyLines = 50;
     // The approx. number of chars per line in a codeblock on Android, on a Google Pixel XL
     this.mobileCharsPerLine = 34;
 
