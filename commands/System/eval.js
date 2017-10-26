@@ -168,5 +168,4 @@ module.exports = class extends Command {
 			return queryMsg.delete();
 		}
 	}
-
 };

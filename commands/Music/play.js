@@ -1,6 +1,5 @@
 const { Command } = require('klasa');
 const Lyricist = require("lyricist");
-
 const lyricist = new Lyricist("hDBtKpcjlMlOFV0efckp1htm71dw9Oj61rblvZGdUeY5U4ZIK8xyPuzaM64_uO7Z");
 
 module.exports = class extends Command {
@@ -84,15 +83,26 @@ module.exports = class extends Command {
                 text: "KozalakBot | Bolca kahve ve eski kıçıkırık bir bilgisayarla yapıldı."
             }
         }});
-        playingMessage.react("🎙️");
-        playingMessage.createReactionCollector(
-            (reaction) => reaction.emoji.name === "🎙️", {time : song.seconds}
+        playingMessage.react("🔉");
+        const collector = playingMessage.createReactionCollector(
+            (reaction) => reaction.emoji.name === "🔉", {time : song.seconds}
         ).on('collect', async r => {
             lyricist.search(song.title).then(async songid => {
                 const lyrics = await lyricist.song(songid[0].id, {fetchLyrics: true});
-                musicInterface.channel.send(`\`\`\`${lyrics.lyrics}\`\`\``).delete(song.seconds);
+                const ly = lyrics.lyrics.slice(0, 1000);
+                const ls = lyrics.lyrics.slice(1000, 2000);
+                console.log('lx', ly, 'ly', ls);
+                if(lyrics.lyrics.indexOf('[Don\'t see your favourite band? Add them yourself!]') !== -1) {
+                    await musicInterface.channel.send("Şarkı için söz bulunamadı.");
+                    return collector.stop();
+                }
+                await musicInterface.channel.send(`\`\`\`${ly}\`\`\``);
+                console.log('lx', ly, 'ly', ls);
+                if(ls) await musicInterface.channel.send(`\`\`\`${ls}\`\`\``);
+                collector.stop();
             });
         });
+        
         await this.delayer(300);
 
         return musicInterface.play()
@@ -124,7 +134,11 @@ module.exports = class extends Command {
         if(!rid) throw "Err";
         const { music } = msg.guild;
         const url = `http://youtu.be/${rid[0]}`;
-        if(music.status === 'idle' && music.queue.lenght === 0) return await music.add(msg.author, url);
+        console.log(`Status ${music.status}, queue: ${music.queue}`);
+        if(music.status === 'idle') {
+            await music.add(msg.author, url);
+            return;
+        }
         //hiç bir şey yokken sadece ilk mesajı göndermesi yeterli.
 
         const song = await music.add(msg.author, url);
