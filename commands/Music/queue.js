@@ -6,8 +6,8 @@ module.exports = class extends Command {
     constructor(...args) {
         super(...args, {
             runIn: ['text'],
-            enabled: false,
-            description: 'Check the queue list.'
+            enabled: true,
+            description: 'Sırayı gösteren muhterem komut.'
         });
     }
 
@@ -16,14 +16,14 @@ module.exports = class extends Command {
         const output = [];
         for (let i = 0; i < Math.min(queue.length, 10); i++) {
             output[i] = [
-                `[__\`${String(i + 1).padStart(2, 0)}\`__] *${queue[i].title.replace(/\*/g, '\\*')}* requested by **${queue[i].requester.tag || queue[i].requester}**`,
+                `[__\`${String(i + 1).padStart(2, 0)}\`__] *${queue[i].title.replace(/\*/g, '\\*')}* ekleyen **${queue[i].requester.tag || queue[i].requester}**`,
                 `   └── <${queue[i].url}> (${showSeconds(queue[i].seconds * 1000)})`
             ].join('\n');
         }
-        if (queue.length > 10) output.push(`\nShowing 10 songs of ${queue.length}`);
+        if (queue.length > 10) output.push(`${queue.length} taneden 10 tanesi gösteriliyor..`);
         else if (autoplay) output.push(`\n**AutoPlay**: <${next}>`);
-
-        return msg.send(output.join('\n'));
+        const embed = new this.client.methods.Embed().author("Sıradaki müzikler.", this.client.user.avatarURL()).setDescription(output.join('\n'));
+        return msg.send({embed});
     }
 
 };

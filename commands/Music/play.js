@@ -1,7 +1,7 @@
 const { Command } = require('klasa');
-const Lyricist = require("lyricist");
-const lyricist = new Lyricist("hDBtKpcjlMlOFV0efckp1htm71dw9Oj61rblvZGdUeY5U4ZIK8xyPuzaM64_uO7Z");
-
+//const Lyricist = require("lyricist");
+//const lyricist = new Lyricist("hDBtKpcjlMlOFV0efckp1htm71dw9Oj61rblvZGdUeY5U4ZIK8xyPuzaM64_uO7Z");
+//Eat Shit Genius.
 module.exports = class extends Command {
 
     constructor(...args) {
@@ -23,12 +23,11 @@ module.exports = class extends Command {
        
         if (!song) return msg.channel.send({ embed: errbed });
        
-        if (!musicInterface.dispatcher || !musicInterface.voiceChannel) await this.client.commands.get('join').run(msg);
+        if (!musicInterface.dispatcher || !musicInterface.voiceChannel) await this.join(msg);
         if (musicInterface.status === 'paused') await this.client.commands.get('resume').run(msg);
        
         if (id) {
             if(musicInterface.status === 'playing') return await this.add(msg, id[1]);            
-            //const url = `https://youtu.be/${id[1]}`;
             await this.add.run(msg, id[1]);
             musicInterface.status = 'playing';
             musicInterface.channel = msg.channel;
@@ -72,7 +71,8 @@ module.exports = class extends Command {
             if (musicInterface.autoplay) return this.autoPlayer(musicInterface).then(() => this.play(musicInterface));
             return musicInterface.channel.send('Sırada hiç şarkı kalmadı bea..').then(() => musicInterface.destroy());
         }
-        const playingMessage = await musicInterface.channel.send({embed: {
+        //const playingMessage = due to lyrics api its removed. 
+        await musicInterface.channel.send({embed: {
             author: {
                 name: "Şimdi oynatılıyor",
                 icon_url: this.client.user.avatarURL()
@@ -83,7 +83,8 @@ module.exports = class extends Command {
                 text: "KozalakBot | Bolca kahve ve eski kıçıkırık bir bilgisayarla yapıldı."
             }
         }});
-        playingMessage.react("🔉");
+        //Removed until find a *goood* lyrics api
+        /*playingMessage.react("🔉");
         const collector = playingMessage.createReactionCollector(
             (reaction) => reaction.emoji.name === "🔉", {time : song.seconds}
         ).on('collect', async r => {
@@ -91,17 +92,15 @@ module.exports = class extends Command {
                 const lyrics = await lyricist.song(songid[0].id, {fetchLyrics: true});
                 const ly = lyrics.lyrics.slice(0, 1000);
                 const ls = lyrics.lyrics.slice(1000, 2000);
-                console.log('lx', ly, 'ly', ls);
                 if(lyrics.lyrics.indexOf('[Don\'t see your favourite band? Add them yourself!]') !== -1) {
                     await musicInterface.channel.send("Şarkı için söz bulunamadı.");
                     return collector.stop();
                 }
                 await musicInterface.channel.send(`\`\`\`${ly}\`\`\``);
-                console.log('lx', ly, 'ly', ls);
                 if(ls) await musicInterface.channel.send(`\`\`\`${ls}\`\`\``);
                 collector.stop();
             });
-        });
+        });*/
         
         await this.delayer(300);
 
@@ -134,7 +133,6 @@ module.exports = class extends Command {
         if(!rid) throw "Err";
         const { music } = msg.guild;
         const url = `http://youtu.be/${rid[0]}`;
-        console.log(`Status ${music.status}, queue: ${music.queue}`);
         if(music.status === 'idle') {
             await music.add(msg.author, url);
             return;
@@ -147,6 +145,25 @@ module.exports = class extends Command {
         .setDescription(`Video Adı: **${song.title}**\n Sahibi: **${song.channel}**\n Uzunluğu: **${this.timeconvert(song.seconds)}**\n Ekleyen: **${msg.member.displayName}**`);
         return msg.channel.send({ embed: playingbed });
 
+    }
+
+    async join(msg) {
+        if(msg.guild.me.voiceChannel) return;
+        const { voiceChannel } = msg.member;
+        if (!voiceChannel) throw 'Bir ses kanalında değilsin falan filan...';
+        this.resolvePermissions(msg, voiceChannel);
+
+        const { music } = msg.guild;
+        await music.join(voiceChannel);
+
+        return null;
+    }
+
+    resolvePermissions(msg, voiceChannel) {
+        const permissions = voiceChannel.permissionsFor(msg.guild.me);
+
+        if (permissions.has('CONNECT') === false) throw 'Welp, birisi bana ses kanallarına bağlanma yetkisi verebilir mi?';
+        if (permissions.has('SPEAK') === false) throw 'Müzik çalmam için konuşmam gerekiyor.. Değil mi? Yada şarkı mı söylüyorum bilmiyorum..';
     }
 
 };
