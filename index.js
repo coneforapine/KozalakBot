@@ -3,7 +3,8 @@ const config = require('./config.json');
 
 const KozalakBot = new Client({
     prefix: config.prefix,
-    cmdEditing: true
+    cmdEditing: true,
+    provider: {engine: "mongodb"}
 });
 
 KozalakBot.login(config.token);

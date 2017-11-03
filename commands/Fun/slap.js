@@ -11,7 +11,8 @@ module.exports = class extends Command {
             description: 'Slap another user as Batman.',
             usage: '<slappedMember:member>',
             extendedHelp: 'Mention another user to slap them. AND BE BATMAN.',
-            botPerms: ['ATTACH_FILES']
+            botPerms: ['ATTACH_FILES'],
+            colldown: 60000
         });
     }
     async run(msg, [slappedMember]) {
