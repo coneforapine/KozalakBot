@@ -41,6 +41,8 @@ module.exports = class extends Command {
         msg.channel.send({embed: playingbed});
         collector.on('collect', async collected => {
             const selection = parseInt(collected) -1;
+            console.log(searchres[selection].id); 
+            //temp debug line.
             if(selection > 0 || selection < 10) {
                 if(musicInterface.status === 'playing') {
                     this.add(msg, searchres[selection].id);

@@ -1,4 +1,5 @@
 const { Command } = require('klasa');
+const { inspect } = require('util');
 
 module.exports = class extends Command {
 
@@ -8,20 +9,22 @@ module.exports = class extends Command {
             runIn: ['text'],
             cooldown: 0,
             aliases: [],
-            permLevel: 7,
+            permLevel: 6,
             name: 'config',
             description: 'Çeşitli ayarları değiştirmenizi sağlar.',
-            usage: '<set|get|reset|list|remove> [key:string] [value:string]'
+            usage: '<set|get|reset|list|remove> [key:string] [value:string]',
+            usageDelim: ' '
         });
     }
 
     async run(msg, [action, key, ...value]) {
-        const configs = msg.guild.settings;
-		if (action !== 'list' && !key) throw msg.language.get('COMMAND_CONF_NOKEY');
-		if (['set', 'remove'].includes(action) && !value[0]) throw msg.language.get('COMMAND_CONF_NOVALUE');
+		const configs = msg.guild.settings;
+		if (action !== 'list' && !key) throw 'Neyi değiştirmem gerketiğini söylemedin...';
+		if (['set', 'remove'].includes(action) && !value[0]) throw 'Değiştirmem gereken değer eksik.';
 		if (['set', 'remove', 'reset'].includes(action) && !configs.id) await this.client.settings.guilds.create(msg.guild);
-		if (['set', 'remove', 'get', 'reset'].includes(action) && !(key in configs)) throw msg.language.get('COMMAND_CONF_GET_NOEXT', key);
+		if (['set', 'remove', 'get', 'reset'].includes(action) && !(key in configs)) throw 'Değiştirmeye çalıştığın şey hiç varolmamış gibi.';
 		await this[action](msg, configs, key, value);
+		return null;
     }
     
     async list(msg, configs) {
@@ -36,6 +39,31 @@ module.exports = class extends Command {
         .setFooter('Kozalakbot | Bolca kahve ve kıçıkırık bir bilgisayar ile yapıldı.');
 		return msg.channel.send({embed});
     }
+
+    async get(msg, configs, key) {
+		return msg.sendMessage(`${key} için şu anki ayar ${configs[key]}`);
+    }
+
+    async set(msg, configs, key, value) {
+		if (this.client.settings.guilds.schema[key].array) {
+			await this.client.settings.guilds.updateArray(msg.guild, 'add', key, value.join(' '));
+			return msg.sendMessage(`${key}: ${value.join(' ')} olarak değiştirildi.`);
+		}
+		const response = await this.client.settings.guilds.update(msg.guild, { [key]: value.join(' ') });
+		return msg.sendMessage(`${key}: ${response[key]} olarak değiştirildi.`);
+    }
+    
+    async reset(msg, configs, key) {
+		const response = await this.client.settings.guilds.reset(msg.guild, key);
+		return msg.sendMessage(`${key}: sıfırlanarak ${response} haline değiştirildi.`);
+    }
+    
+    async remove(msg, configs, key, value) {
+		if (!this.client.settings.guilds.schema[key].array) return msg.sendMessage('Bu ayar dizi türünde değil, remove yerine reset kullanın.');
+		return this.client.settings.guilds.updateArray(msg.guild, 'remove', key, value.join(' '))
+			.then(() => msg.sendMessage(`${key} başarıyla kaldırıldı.`))
+			.catch(err => msg.sendMessage(err));
+	}
     
     async init() {
         if (!this.client.settings.guilds.schema.modlog && this.client.settings.guilds.schema.starboard) {

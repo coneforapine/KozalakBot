@@ -13,6 +13,7 @@ module.exports = class extends Command {
 
     async run(msg) {
         const { next, queue, autoplay } = msg.guild.music;
+        if(autoplay) return msg.channel.send(`Autoplay açık, sonraki şarkı ${next}`);
         const output = [];
         for (let i = 0; i < Math.min(queue.length, 10); i++) {
             output[i] = [
@@ -21,7 +22,6 @@ module.exports = class extends Command {
             ].join('\n');
         }
         if (queue.length > 10) output.push(`${queue.length} taneden 10 tanesi gösteriliyor..`);
-        else if (autoplay) output.push(`\n**AutoPlay**: <${next}>`);
         const embed = new this.client.methods.Embed().author("Sıradaki müzikler.", this.client.user.avatarURL()).setDescription(output.join('\n'));
         return msg.send({embed});
     }
