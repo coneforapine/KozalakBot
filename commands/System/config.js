@@ -1,9 +1,4 @@
-const {
-  Command
-} = require('klasa');
-const {
-  inspect
-} = require('util');
+const { Command } = require('klasa');
 
 module.exports = class extends Command {
 
@@ -34,19 +29,17 @@ module.exports = class extends Command {
   async list(msg, configs) {
     const embed = new this.client.methods.Embed()
       .setAuthor(`${msg.guild.name} için ayarlar.`, this.client.user.avatarURL())
-      .addField(`Prefix:`, `${configs.prefix}`, )
-      .addField(`Modlog:`, `${configs.modlog ? '<#' + configs.modlog +'>' : 'Bu ayar için herhangi bir değer yok.'}`, true) 
-      .addField(`Starboard`, `${configs.starboard ? '<#' + configs.starboard + '>' : 'Bu ayar için herhangi bir değer yok.'}`, true)
+      .addField(`Prefix:`, `${configs.prefix}`)
+      .addField(`Modlog:`, `${configs.modlog ? `<#${configs.modlog}>` : 'Bu ayar için herhangi bir değer yok.'}`, true)
+      .addField(`Starboard`, `${configs.starboard ? `<#${configs.starboard}>` : 'Bu ayar için herhangi bir değer yok.'}`, true)
       .addBlankField(true)
-      .addField(`Admin Role`, `${configs.adminrole ? '<@&' + configs.adminrole + '>' : 'Bu ayar için herhangi bir değer yok.'}`, true)
-      .addField(`Mode Role`, `${configs.modrole ? '<@&' + configs.modrole + '>' : 'Bu ayar için herhangi bir değer yok.'}`, true)
+      .addField(`Admin Role`, `${configs.adminrole ? `<@&${configs.adminrole}>` : 'Bu ayar için herhangi bir değer yok.'}`, true)
+      .addField(`Mode Role`, `${configs.modrole ? `<@&${configs.modrole}>` : 'Bu ayar için herhangi bir değer yok.'}`, true)
       .addBlankField(true)
-      .setColor("#20B2AA")
+      .setColor('#20B2AA')
       .setTimestamp()
       .setFooter('Kozalakbot | Bolca kahve ve kıçıkırık bir bilgisayar ile yapıldı.');
-    return msg.channel.send({
-      embed
-    });
+    return msg.channel.send({ embed });
   }
 
   async get(msg, configs, key) {
@@ -58,8 +51,8 @@ module.exports = class extends Command {
       await this.client.settings.guilds.updateArray(msg.guild, 'add', key, value.join(' '));
       return msg.sendMessage(`${key}: ${value.join(' ')} olarak değiştirildi.`);
     }
-    const response = await this.client.settings.guilds.update(msg.guild, {[key]: value.join(' ')});
-    return this.sender(response, key, msg)
+    const response = await this.client.settings.guilds.update(msg.guild, { [key]: value.join(' ') });
+    return this.sender(response, key, msg);
   }
 
   async reset(msg, configs, key) {
@@ -75,15 +68,16 @@ module.exports = class extends Command {
   }
 
   async sender(response, key, msg) {
-    if (response[key] === "starboard" || response[key] === "modlog" || response[key] === "serverlog") return msg.sendMessage(`${key}: <#${response[key]}> olarak değiştirildi.`);
-    if (response[key] === "adminRole" || response[key] === "modRole") return msg.sendMessage(`${key}: <@&${response[key]}> olarak değiştirildi.`); //I know its not the proper way, but sssh. /shrug.
-    return msg.sendMessage(`${key}: ${response[key]} olarak değiştirildi.`)
+    if (response[key] === 'starboard' || response[key] === 'modlog' || response[key] === 'serverlog') return msg.sendMessage(`${key}: <#${response[key]}> olarak değiştirildi.`);
+    if (response[key] === 'adminRole' || response[key] === 'modRole') return msg.sendMessage(`${key}: <@&${response[key]}> olarak değiştirildi.`); // I know its not the proper way, but sssh. /shrug.
+    return msg.sendMessage(`${key}: ${response[key]} olarak değiştirildi.`);
   }
 
   async init() {
-    if (!this.client.settings.guilds.schema.modlog) await this.client.settings.guilds.add('modlog', {type: "TextChannel"});
-    if (!this.client.settings.guilds.schema.starboard) await this.client.settings.guilds.add('starboard', {type: "TextChannel"});
-    if (!this.client.settings.guilds.schema.adminrole) await this.client.settings.guilds.add('adminrole', {type: "Role"});
-    if (!this.client.settings.guilds.schema.modrole) await this.client.settings.guilds.add('modrole', {type: "Role"});
+    if (!this.client.settings.guilds.schema.modlog) await this.client.settings.guilds.add('modlog', { type: 'TextChannel' });
+    if (!this.client.settings.guilds.schema.starboard) await this.client.settings.guilds.add('starboard', { type: 'TextChannel' });
+    if (!this.client.settings.guilds.schema.adminrole) await this.client.settings.guilds.add('adminrole', { type: 'Role' });
+    if (!this.client.settings.guilds.schema.modrole) await this.client.settings.guilds.add('modrole', { type: 'Role' });
   }
+
 };

@@ -11,7 +11,7 @@ module.exports = class extends Provider {
 
 	async init() {
 		this.db = await Mongo.connect(`mongodb://localhost:27017/Kozalakbot`);
-		console.log(this.db.collections());
+		this.client.emit('log', 'MongoDB Connection succseed *still don\'t know how to write*', 'log');
 	}
 
 	/* Table methods */
@@ -22,7 +22,7 @@ module.exports = class extends Provider {
 	 * @returns {Promise<boolean>}
 	 */
 	hasTable(table) {
-		return this.db.collections()
+		return this.db.listCollections().toArray()
 			.then(collections => collections.includes(table));
 	}
 
@@ -136,7 +136,6 @@ module.exports = class extends Provider {
 		const res = await this.get(table, id);
 		return this.db.collection(table).updateOne(resolveQuery(id), Object.assign(res, doc));
 	}
-	
 
 	/**
 	 * Replaces a Document with a new Document specified by the user *
