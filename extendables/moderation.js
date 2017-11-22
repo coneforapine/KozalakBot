@@ -7,7 +7,8 @@ module.exports = class extends Extendable {
     }
 
     get extend() {
-        return this.client.mod.create(this);
+        const db = this.client.providers.get("mongodb");
+        return this.client.mod.create(this, db);
     }
 
 };
