@@ -10,8 +10,11 @@ module.exports = class extends Provider {
 	}
 
 	async init() {
-		this.db = await Mongo.connect(`mongodb://localhost:27017/Kozalakbot`);
-		this.client.emit('log', 'MongoDB Connection succseed *still don\'t know how to write*', 'log');
+		if (!this.db) {
+			this.db = await Mongo.connect(`mongodb://localhost:27017/Kozalakbot`).catch(err => this.client.emit("err", err, 'err'));
+			this.client.emit('log', 'MongoDB Connection succeed *still don\'t know how to write*', 'log');
+		}
+		return;
 	}
 
 	/* Table methods */
