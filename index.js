@@ -15,5 +15,5 @@ KozalakBot.once('ready', async () => {
         await db.createTable("guildData");
     }
     for (const guild of KozalakBot.guilds.values()) KozalakBot.queue.create(guild);
-    for (const guild of KozalakBot.guilds.values()) KozalakBot.mod.create(guild, db);
+    for (const guild of KozalakBot.guilds.values()) await KozalakBot.mod.create(guild, db);
 });

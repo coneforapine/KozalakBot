@@ -2,3 +2,4 @@ node_modules
 bwd
 commands/moderation
 config.json
+.vscode
