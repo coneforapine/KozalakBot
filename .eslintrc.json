@@ -80,7 +80,7 @@
 		"eol-last": "error",
 		"func-names": "error",
 		"func-style": ["error", "declaration", { "allowArrowFunctions": true }],
-		"id-length": ["error", { "exceptions": ["i", "j", "a", "b", "x", "y"] }],
+		"id-length": ["error", { "exceptions": ["i", "j", "a", "b", "x", "y", "c", "m"] }],
 		"key-spacing": "error",
 		"keyword-spacing": ["error", {
 			"overrides": {

@@ -1,6 +1,4 @@
 const { Command } = require('klasa');
-// const Lyricist = require("lyricist");
-// const lyricist = new Lyricist("hDBtKpcjlMlOFV0efckp1htm71dw9Oj61rblvZGdUeY5U4ZIK8xyPuzaM64_uO7Z");
 // Eat Shit Genius.
 module.exports = class extends Command {
 
@@ -26,7 +24,7 @@ module.exports = class extends Command {
         if (!song) return msg.channel.send({ embed: errbed });
 
         if (!musicInterface.dispatcher || !musicInterface.voiceChannel) await this.join(msg);
-        if (musicInterface.status === 'paused') await this.client.commands.get('resume').run(msg);
+        if (musicInterface.status === 'paused') await this.client.commands.get('resume').run(msg).then(msg.channel.send("Zaten durdulmuş bir müzik var, devam ettiriliyor..."));
 
         if (id) {
             if (musicInterface.status === 'playing') return await this.add(msg, id[1]);
@@ -44,7 +42,6 @@ module.exports = class extends Command {
         msg.channel.send({ embed: playingbed });
         collector.on('collect', async collected => {
             const selection = parseInt(collected) - 1;
-            // temp debug line.
             if (selection > 0 || selection < 10) {
                 if (musicInterface.status === 'playing') {
                     this.add(msg, searchres[selection].id);
@@ -74,11 +71,10 @@ module.exports = class extends Command {
             if (musicInterface.autoplay) return this.autoPlayer(musicInterface).then(() => this.play(musicInterface));
             return musicInterface.channel.send('Sırada hiç şarkı kalmadı bea..').then(() => musicInterface.destroy());
         }
-        // const playingMessage = due to lyrics api its removed.
         await musicInterface.channel.send({
  embed: {
             author: {
-                name: "Şimdi oynatılıyor",
+                name: "Şimdi oynatılıyor", // eslint-disable-next-line
                 icon_url: this.client.user.avatarURL()
             },
             description: `Video Adı: **${song.title}**\n Sahibi: **${song.channel}**\n Uzunluğu: **${this.timeconvert(song.seconds)}**\n Ekleyen: **${song.requester}**`,
@@ -86,25 +82,6 @@ module.exports = class extends Command {
             footer: { text: "KozalakBot | Bolca kahve ve eski kıçıkırık bir bilgisayarla yapıldı." }
         }
  });
-        // Removed until find a *goood* lyrics api
-        /* playingMessage.react("🔉");
-        const collector = playingMessage.createReactionCollector(
-            (reaction) => reaction.emoji.name === "🔉", {time : song.seconds}
-        ).on('collect', async r => {
-            lyricist.search(song.title).then(async songid => {
-                const lyrics = await lyricist.song(songid[0].id, {fetchLyrics: true});
-                const ly = lyrics.lyrics.slice(0, 1000);
-                const ls = lyrics.lyrics.slice(1000, 2000);
-                if(lyrics.lyrics.indexOf('[Don\'t see your favourite band? Add them yourself!]') !== -1) {
-                    await musicInterface.channel.send("Şarkı için söz bulunamadı.");
-                    return collector.stop();
-                }
-                await musicInterface.channel.send(`\`\`\`${ly}\`\`\``);
-                if(ls) await musicInterface.channel.send(`\`\`\`${ls}\`\`\``);
-                collector.stop();
-            });
-        });*/
-
         await this.delayer(300);
 
         return musicInterface.play()
