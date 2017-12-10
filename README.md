@@ -6,3 +6,5 @@
 - FFMPEG Binaries
 - Node Opus yada Opuscript *package.json* dosyasında olması gerekiyor.
 - Biraz beyin ve bol bol kahve. 
+
+> Fork it, code it, love it.
